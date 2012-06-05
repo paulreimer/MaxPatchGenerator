@@ -1,0 +1,8 @@
+*.pyc
+*.pyo
+*~
+*.lock
+*.DS_Store
+*.swp
+*.out
+
