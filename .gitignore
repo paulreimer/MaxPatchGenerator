@@ -5,5 +5,8 @@
 *.DS_Store
 *.swp
 *.out
+
 *_pb2.py
 *.maxpat
+
+custom.py
