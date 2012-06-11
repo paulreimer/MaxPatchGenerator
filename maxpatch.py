@@ -36,9 +36,9 @@ class MaxPatch(object):
           "minor": 1,
           "revision": 9
         },
-        "rect": [ 126.0, 226.0, 640.0, 480.0 ],
+        "rect": [ 126.0, 226.0, 850.0, 600.0 ],
         "bglocked": 0,
-        "defrect": [ 126.0, 226.0, 640.0, 480.0 ],
+        "defrect": [ 126.0, 226.0, 850.0, 600.0 ],
         "openrect": [ 0.0, 0.0, 0.0, 0.0 ],
         "openinpresentation": 0,
         "default_fontsize": 12.0,
@@ -71,7 +71,7 @@ class MaxPatch(object):
       'patching_rect': rect,
       'id': self.new_id(),
       'numinlets': numinlets,
-      'numoutlets': numinlets
+      'numoutlets': numoutlets
       }
     box.update(args)
 
@@ -87,7 +87,20 @@ class MaxPatch(object):
 
     return self.add_box(maxclass, rect, numinlets, numoutlets, text_box)
 
-  def add_slider(self, rect=[0, 0, 0, 0], args={}):
+  def add_message(self, message, rect=[0, 0, 0, 0], args={}):
+    args.update({'text': str(message)})
+    return self.add_text_box('message', rect, numinlets=2, numoutlets=1, args=args)
+
+  def add_comment(self, comment, rect=[0, 0, 0, 0], args={}):
+    args.update({'text': comment})
+    return self.add_text_box('comment', rect, numinlets=1, numoutlets=0, args=args)
+
+  def add_slider(self, rect=[0, 0, 0, 0], bounds=(0.0, 1.0), args={}):
+    size = bounds[1]  - bounds[0]
+    args.update({'size': size})
+    if bounds[0] is not 0:
+      args.update({'min': bounds[0]})
+
     return self.add_box('slider', rect, args=args)
 
   def add_number(self, rect=[0, 0, 0, 0], datatype='int'):
@@ -98,7 +111,7 @@ class MaxPatch(object):
 
   def add_toggle(self, rect=[0, 0, 0, 0], typetags=''):
     return self.add_box('toggle', rect=rect, args={
-      'outlettype' : [ 'int' ]
+      'outlettype' : [ 'int' ],
       })
 
   def add_prepend(self, rect=[0, 0, 0, 0], addr='/'):
@@ -108,15 +121,26 @@ class MaxPatch(object):
 
   def add_pack(self, rect=[0, 0, 0, 0], typetags=''):
     return self.add_text_box(rect=rect, numinlets=len(typetags), numoutlets=1, args={
-      'text': 'pack ' + ' '.join(typetags),
+      'text': 'pak ' + ' '.join(typetags),
       })
 
-  def add_line(self, box1, box2, box1_outlet=0, box2_inlet=0):
+  def add_newobj(self, text, rect=[0, 0, 0, 0], numinlets=1, numoutlets=1, args={}):
+    args.update({'text': text})
+    return self.add_text_box(rect=rect, numinlets=numinlets, numoutlets=numoutlets, args=args)
+
+  def add_preset(self, rect=[0, 0, 0, 0], args={}):
+    args.update({
+      'outlettype' : [ 'preset', 'int', 'preset', 'int' ],
+      'preset_data': [],
+      })
+    return self.add_box('preset', rect, 1, 4, args)
+
+  def add_line(self, box1, box2, box1_outlet=0, box2_inlet=0, hidden=False):
     line = {'patchline': {
       'source' : [ box1['id'], box1_outlet ],
       'destination' : [ box2['id'], box2_inlet ],
-      'hidden' : 0,
-      'midpoints' : [ ]
+      'hidden' : 1 if hidden else 0,
+      'midpoints' : [ ],
       }}
 
     self.patch['patcher']['lines'].append(line)
